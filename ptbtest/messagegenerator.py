@@ -140,6 +140,7 @@ class MessageGenerator(PtbGenerator):
                     reply_to_message=None,
                     text=None,
                     entities=None,
+                    caption_entities=None,
                     audio=None,
                     document=None,
                     photo=None,
@@ -181,6 +182,10 @@ class MessageGenerator(PtbGenerator):
             text (str): The text for the message, can make use of markdown or html, make sure to specify with parse_mode
             parse_mode (Optional[str]): "HTML" or "Markdown" parses the text and fills entities
             entities (Optional[lst(telegram.MessageEntity)]): when text and parsemode are set this will be filled with the entities in the text.  # noqa: E501
+            caption_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
+                usernames, URLs, bot commands, etc. that appear in the caption. See
+                :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities` methods for how
+                to use properly.
             reply_to_message (Optional[telegram.Message): Messages this one is a reply to
             forward_from (Optional[telegram.User): User this message is forwarded from
             forward_from_chat (Optional[telegram.Chat]): channel this message is forwarded from
@@ -221,7 +226,10 @@ class MessageGenerator(PtbGenerator):
             forward_date, forward_from, forward_from_chat,
             forward_from_message_id)
 
-        text, entities = self._handle_text(text, parse_mode)
+        if text:
+            text, entities = self._handle_text(text, parse_mode)
+        elif caption:
+            caption, caption_entities = self._handle_text(caption, parse_mode)
 
         new_chat_photo = self._handle_status(
             channel_chat_created, chat, delete_chat_photo, group_chat_created,
@@ -245,6 +253,7 @@ class MessageGenerator(PtbGenerator):
             forward_from_chat=forward_from_chat,
             reply_to_message=reply_to_message,
             entities=entities,
+            caption_entities=caption_entities,
             audio=audio,
             document=document,
             photo=photo,
